@@ -1,8 +1,13 @@
 openapi: 3.0.3
 info:
-  title: Magnit B2B Platform API
-  description: >-
-    Описание API для интеграции с Магнит. События от системы Магнит реализуются на стороне Партнера, остальные методы реализованы на стороне Магнит. Сервис Партнера выступает в роли клиента. Общение происходит на основании pull-push-модели, т.е. сервис Партнера как клиент запрашивает информацию о ресурсе, может создавать/обновлять ресурсы, если это необходимо, получать события от системы Магнит. AuthRequest.client_id и AuthRequest.client_secret выдаются по запросу
+  title: Magnit Market API
+  description: >
+    Magnit Market API. <br/>
+
+    Сервис Партнера выступает в роли клиента запрашивает данные о ресурсах, создает и обновляет сущности. <br/>
+
+    Авторизация выполняется через заголовок X-Api-Key.
+
   version: 0.1.38
 servers:
   - url: 'https://b2b-api.magnit.ru/api'
@@ -13,21 +18,21 @@ security:
   - apiKeyAuth: []
 tags:
   - name: Товары
-    description: Партнерская интеграция с Magnit Market по модели FBS. Товары
+    description: Magnit Market API. Товары
   - name: Категории
-    description: Партнерская интеграция с Magnit Market по модели FBS. Категории
+    description: Magnit Market API. Категории
   - name: Цены
-    description: Партнерская интеграция с Magnit Market по модели FBS. Цены
+    description: Magnit Market API. Цены
   - name: Цены (v2)
-    description: Партнерская интеграция с Magnit Market по модели FBS. Цены (v2)
+    description: Magnit Market API. Цены (v2)
   - name: Остатки
-    description: Партнерская интеграция с Magnit Market по модели FBS. Товары
+    description: Magnit Market API. Товары
   - name: Магазины
-    description: Партнерская интеграция с Magnit Market по модели FBS. Магазины
+    description: Magnit Market API. Магазины
   - name: Задания на сборку
-    description: Партнерская интеграция с Magnit Market по модели FBS. Задания на сборку
+    description: Magnit Market API. Задания на сборку
   - name: Отгрузка посылок
-    description: Партнерская интеграция с Magnit Market по модели FBS. Отгрузка посылок
+    description: Magnit Market API. Отгрузка посылок
 paths:
   /api/seller/v1/orders/cancel:
     post:
