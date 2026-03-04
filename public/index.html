@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Magnit Market Partner API Reference</title>
+    <style>body{margin:0}</style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      (async function initApiReference() {
+        function getBaseUrl() {
+          const current = new URL(window.location.href);
+          const path = current.pathname || "/";
+          const trailingSlash = path.endsWith("/");
+          const lastSegment = path.split("/").pop() || "";
+          const isFile = lastSegment.includes(".");
+          const basePath = trailingSlash ? path : (isFile ? path.slice(0, path.lastIndexOf("/") + 1) : path + "/");
+
+          current.pathname = basePath;
+          current.search = "";
+          current.hash = "";
+
+          return current.href;
+        }
+
+        function loadScript(src) {
+          return new Promise(function(resolve, reject) {
+            const script = document.createElement("script");
+            script.src = src;
+            script.onload = resolve;
+            script.onerror = function() {
+              reject(new Error("Failed to load script: " + src));
+            };
+            document.head.appendChild(script);
+          });
+        }
+
+        const baseUrl = getBaseUrl();
+        const apiReferenceUrl = new URL("api-reference.js", baseUrl).href;
+        const swaggerUrl = new URL("swagger.yaml", baseUrl).href;
+        const ruPatchUrl = new URL("scalar-ru-patch.js", baseUrl).href;
+
+        await loadScript(apiReferenceUrl);
+
+        Scalar.createApiReference("#app", {
+          url: swaggerUrl,
+          agent: { disabled: true },
+          showDeveloperTools: "never",
+          telemetry: false,
+          showApiClient: false
+        });
+
+        await loadScript(ruPatchUrl);
+        ScalarRuPatch.init({ debug: false, hookShadowDom: true });
+      })().catch(function(error) {
+        console.error(error);
+      });
+    </script>
+  </body>
+</html>
