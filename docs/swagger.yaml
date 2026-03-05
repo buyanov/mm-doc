@@ -1,1 +1,3593 @@
-swagger.yaml
+openapi: 3.0.3
+info:
+  title: Magnit Market API
+  description: >
+    API для партнёров Magnit Market. Позволяет управлять товарами, ценами и остатками, а также собирать и отгружать заказы. <br/>
+
+    Доступ к API осуществляется по ключу, передаваемому в заголовке X-Api-Key.
+
+  version: 0.1.38
+servers:
+  - url: 'https://b2b-api.magnit.ru'
+    description: Основной стенд интеграции.
+  - url: 'https://b2b-api-gateway.uat.ya.magnit.ru'
+    description: Демо стенд для проведения тестирования процессинга заказов.
+security:
+  - apiKeyAuth: []
+tags:
+  - name: Товары
+    description: Magnit Market API. Товары
+  - name: Категории
+    description: Magnit Market API. Категории
+  - name: Цены
+    description: Magnit Market API. Цены
+  - name: Цены (v2)
+    description: Magnit Market API. Цены (v2)
+  - name: Остатки
+    description: Magnit Market API. Товары
+  - name: Магазины
+    description: Magnit Market API. Магазины
+  - name: Задания на сборку
+    description: Magnit Market API. Задания на сборку
+  - name: Отгрузка посылок
+    description: Magnit Market API. Отгрузка посылок
+paths:
+  /api/seller/v1/orders/cancel:
+    post:
+      description: |
+        ⚠️ Задание может быть отменено, до перевода в статус ASSEMBLED.
+
+        ⚠️ Это действие нельзя отменить.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCancelRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCancelResponse'
+          description: Запрос успешно выполнен
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Отмена задания на сборку
+      tags:
+        - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/orders/cancel-items:
+    post:
+      description: "Отменяемый товар не должен быть распределен по посылкам. \n\n⚠️ Это действие нельзя отменить.\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCancelItemsRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCancelItemsResponse'
+          description: Актуальные информация о задании на сборку
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Отмена части товаров
+      tags:
+        - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/orders/complete:
+    post:
+      description: >
+        Необходимо вызвать этот метод, чтобы посылки можно было добавить в отгрузку
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCompleteRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCompleteResponse'
+          description: Список посылок
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Подтверждение сборки
+      tags:
+        - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/orders/list:
+    post:
+      description: |
+        Возвращает список заданий на сборку за указанный период времени.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdersListRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersListResponse'
+          description: Список заданий на сборку
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Список заданий на сборку
+      tags:
+        - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/orders/list/unprocessed:
+    post:
+      description: >
+        Возвращает список необработанных заданий на сборку за указанный период времени.
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdersUnprocessedRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersUnprocessedResponse'
+          description: Список заданий на сборку
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Список необработанных заданий на сборку
+      tags:
+        - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/orders/parcels:
+    post:
+      description: |
+        Позволяет передать разбиение всего задания на посылки.
+        Метод можно использовать если задания на сборку находится в статус NEW
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderParcelsRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderParcelsResponse'
+          description: Посылки и их идентификаторы
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Передать разбиение на посылки
+      tags:
+        - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/parcels/cancel:
+    post:
+      description: >
+        Метод позволяет отменить собранную посылку. При этом также отменяются товары, находящиеся в ней.
+
+
+
+
+
+
+         ⚠️ Это действие нельзя отменить.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelsCancelRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelsCancelResponse'
+          description: Посылка успешно отменена
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Отменить посылку вместе с товарами
+      tags:
+        - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/parcels/create:
+    post:
+      description: |
+        Метод позволяет передать состав одной посылки.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelsCreateRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelsCreateResponse'
+          description: Посылка успешно создана
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Создание посылки
+      tags:
+        - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/parcels/get-labels:
+    post:
+      description: |
+        Метод возвращает этикетки для посылок в виде одного файла
+      parameters:
+        - $ref: '#/components/parameters/DocumentAccept'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelsLabelsRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelsLabelsResponse'
+            application/pdf:
+              schema:
+                example: |-
+                  %PDF-1.3
+                  3 0 obj
+                  ...
+                format: binary
+                type: string
+          description: Запрос успешно выполнен
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Получить этикетки для посылок
+      tags:
+        - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/parcels/list:
+    post:
+      description: |
+        Возвращает список посылок за указанный период времени.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelsListRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelsListResponse'
+          description: Список посылок
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Список посылок
+      tags:
+        - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/parcels/set-marking:
+    post:
+      description: >
+        Передать маркировку можно до подтверждения сборки задания.
+
+
+        ⚠️ Маркетплейс не производит проверку и вывод марок из оборота.
+
+
+        ⚠️ Необходимо передавать маркировку сразу на все единицы товара (т.е. равным quantity этого товара в посылке).
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelsAddMarkingRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelsAddMarkingResponse'
+          description: Запрос успешно выполнен
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Передать маркировку товаров внутри посылки
+      tags:
+        - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/parcels/unpack:
+    post:
+      description: >
+        Метод позволяет удалить посылку. Для этого посылка должна находиться в статусе NEW.
+
+
+        Товары из удаляемой посылки можно распределить повторно.
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelsUnpackRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelsUnpackResponse'
+          description: Посылка успешно удалена
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Удаляет посылку
+      tags:
+        - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/shipments/add-parcels:
+    post:
+      description: |
+        Добавляет посылки к формируемой отгрузке.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipmentAddParcelsRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentAddParcelsResponse'
+          description: Актуальный состав отгрузки
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Добавить посылки к отгрузке
+      tags:
+        - Отгрузка посылок
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/shipments/cancel:
+    post:
+      description: "Отменяет отгрузку. Отменить отгрузку можно только на статусе CONFIRMED  \n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipmentsCancelRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentsCancelResponse'
+          description: Состав отгрузки
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Отменить отгрузку
+      tags:
+        - Отгрузка посылок
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/shipments/confirm:
+    post:
+      description: "Завершить формирование отгрузки. \n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipmentsConfirmRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentsConfirmResponse'
+          description: Состав отгрузки
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Подтвердить отгрузку
+      tags:
+        - Отгрузка посылок
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/shipments/get-documents:
+    post:
+      description: |
+        Возвращает выбранный документ для отгрузки
+      parameters:
+        - $ref: '#/components/parameters/DocumentAccept'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipmentGetDocumentsRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentGetDocumentsResponse'
+            application/pdf:
+              schema:
+                example: |-
+                  %PDF-1.3
+                  3 0 obj
+                  ...
+                format: binary
+                type: string
+          description: Документ по отгрузке
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Получить документы по отгрузке
+      tags:
+        - Отгрузка посылок
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/shipments/list:
+    post:
+      description: |
+        Возвращает список отгрузок за указанный период времени.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipmentListRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentListResponse'
+          description: Список отгрузок
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Список отгрузок
+      tags:
+        - Отгрузка посылок
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/shipments/remove-parcels:
+    post:
+      description: |
+        Удаляет посылки из формируемой отгрузки.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipmentRemoveParcelsRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentRemoveParcelsResponse'
+          description: Актуальный состав отгрузки
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Удалить посылки из отгрузки
+      tags:
+        - Отгрузка посылок
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/categories:
+    get:
+      description: REST эндпоинт для получения списка активных категорий
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: '#/components/schemas/ExternalSellerCategoryDto'
+                type: array
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Получение списка категорий
+      tags:
+        - Категории
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:categories'
+          - 'mm:b2b:all'
+  /api/seller/v1/empty_shops:
+    get:
+      description: REST эндпоинт для получения списка активных магазинов
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: '#/components/schemas/ShopDto'
+                type: array
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Получение списка магазинов
+      tags:
+        - Категории
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:shops'
+  /api/seller/v1/products/defined-characteristics:
+    post:
+      description: REST эндпоинт для получения списка характеристик
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryCharacteristicsRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: '#/components/schemas/ExternalSellerCharacteristicsDto'
+                type: array
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Получение списка характеристик
+      tags:
+        - Категории
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:categories'
+          - 'mm:b2b:all'
+  /api/seller/v1/products/dictionary:
+    get:
+      description: REST эндопинт для получения списка словарей
+      parameters:
+        - description: Идентификатор справочника
+          in: query
+          name: dictionary_id
+          required: true
+          schema:
+            format: int64
+            type: integer
+        - description: 'Тип справочника (например, DEFINED, PRODUCT, SKU)'
+          in: query
+          name: type
+          required: true
+          schema:
+            type: string
+        - description: Поисковый запрос для фильтрации значений справочника
+          in: query
+          name: search
+          required: false
+          schema:
+            default: ''
+            type: string
+        - description: Номер страницы для пагинации
+          in: query
+          name: page
+          required: false
+          schema:
+            default: 0
+            format: int32
+            type: integer
+        - description: Количество элементов на странице
+          in: query
+          name: page_size
+          required: false
+          schema:
+            default: 10
+            format: int32
+            type: integer
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DictionaryResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Получение списка словарей
+      tags:
+        - Категории
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:categories'
+          - 'mm:b2b:all'
+  /api/seller/v1/products/sku:
+    post:
+      description: REST эндпоинт для создания списка СКУ
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSkuRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CreateSkuResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Создание СКУ
+      tags:
+        - Товары
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:products'
+          - 'mm:b2b:all'
+  /api/seller/v1/products/sku/list:
+    post:
+      description: REST эндпоинт для получения списка СКУ
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkuListRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SkuListResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Получение списка СКУ
+      tags:
+        - Товары
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:products'
+          - 'mm:b2b:all'
+  /api/seller/v1/products/sku/price:
+    post:
+      description: REST эндпоинт для обновления цен
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PricesRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SkuInfoResponsePriceUpdateResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Обновление цен
+      tags:
+        - Цены
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:prices'
+          - 'mm:b2b:all'
+  /api/seller/v1/products/sku/price/info:
+    post:
+      description: REST эндпоинт для получения данных по ценам
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkuInfoRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SkuInfoResponsePriceInfoResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Получение данных по ценам
+      tags:
+        - Цены
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:prices'
+          - 'mm:b2b:all'
+  '/api/seller/v1/products/sku/shops/{shop_id}/short/list':
+    post:
+      description: REST эндпоинт для получения списка СКУ с основной информацией по СКУ
+      parameters:
+        - description: Идентификатор магазина
+          in: path
+          name: shop_id
+          required: true
+          schema:
+            format: int64
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShortSkuInfoRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ShortSkuInfoResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Получение списка СКУ с основной информацией
+      tags:
+        - Товары
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:products'
+          - 'mm:b2b:all'
+  '/api/seller/v1/products/sku/shops/{shop_id}/sku/archive':
+    post:
+      description: REST эндпоинт для архивации списка СКУ
+      parameters:
+        - description: Идентификатор магазина
+          in: path
+          name: shop_id
+          required: true
+          schema:
+            format: int64
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkuArchiveRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SkuInfoResponseSkuArchiveResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Архивация СКУ
+      tags:
+        - Товары
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:products'
+          - 'mm:b2b:all'
+  '/api/seller/v1/products/sku/shops/{shop_id}/sku/delete':
+    post:
+      description: REST эндпоинт для удаления продукта
+      parameters:
+        - description: Идентификатор магазина
+          in: path
+          name: shop_id
+          required: true
+          schema:
+            format: int64
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductDeleteRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SkuInfoResponseProductDeleteResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Удаление продукта
+      tags:
+        - Товары
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:products'
+          - 'mm:b2b:all'
+  '/api/seller/v1/products/sku/shops/{shop_id}/sku/unarchive':
+    post:
+      description: REST эндпоинт для разархивации списка СКУ
+      parameters:
+        - description: Идентификатор магазина
+          in: path
+          name: shop_id
+          required: true
+          schema:
+            format: int64
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkuArchiveRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SkuInfoResponseSkuArchiveResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Разархивация СКУ
+      tags:
+        - Товары
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:products'
+          - 'mm:b2b:all'
+  '/api/seller/v1/products/sku/shops/{shop_id}/sku/update':
+    post:
+      description: REST эндпоинт для обновления списка СКУ
+      parameters:
+        - in: path
+          name: shop_id
+          required: true
+          schema:
+            format: int64
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSkuRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CreateSkuResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Обновление СКУ
+      tags:
+        - Товары
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:products'
+          - 'mm:b2b:all'
+  /api/seller/v1/products/sku/stocks:
+    post:
+      description: REST эндпоинт для обновления остатков
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Обновление остатков
+      tags:
+        - Остатки
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:stocks'
+          - 'mm:b2b:all'
+  /api/seller/v1/products/sku/stocks/info:
+    post:
+      description: REST эндпоинт для получения информации об остатках
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkuInfoRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SkuInfoResponseStockInfoResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Получение информации об остатках
+      tags:
+        - Остатки
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:stocks'
+          - 'mm:b2b:all'
+  '/api/seller/v1/products/sku/tasks/{task_id}/status':
+    get:
+      description: REST эндпоинт для получения статуса задачи создания СКУ
+      parameters:
+        - description: Идентификатор задачи создания СКУ
+          in: path
+          name: task_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TaskStatusResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Получение статуса задачи создания СКУ
+      tags:
+        - Товары
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:products'
+          - 'mm:b2b:all'
+  /api/seller/v1/shops:
+    get:
+      description: REST эндпоинт для получения списка активных магазинов
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: '#/components/schemas/ShopDto'
+                type: array
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Получение списка магазинов
+      tags:
+        - Магазины
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:shops'
+  '/api/seller/v2/{shopId}/products/sku/price':
+    post:
+      description: REST эндпоинт для массового обновления цен SKU
+      parameters:
+        - in: path
+          name: shopId
+          required: true
+          schema:
+            format: int64
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriceUpdateV2Request'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PriceUpdateV2Response'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Обновление цен SKU (v2)
+      tags:
+        - Цены (v2)
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:prices'
+          - 'mm:b2b:all'
+  '/api/seller/v2/{shopId}/products/sku/price/info':
+    post:
+      description: REST эндпоинт для получения цен SKU
+      parameters:
+        - in: path
+          name: shopId
+          required: true
+          schema:
+            format: int64
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriceInfoV2Request'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PriceInfoV2Response'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
+      security:
+        - apiKeyAuth: []
+      summary: Получение цен SKU (v2)
+      tags:
+        - Цены (v2)
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:prices'
+          - 'mm:b2b:all'
+components:
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+  schemas:
+    ApiError:
+      properties:
+        message:
+          description: Описание ошибки.
+          type: string
+      required:
+        - message
+      type: object
+    ApiErrorResponse:
+      allOf:
+        - properties:
+            errors:
+              description: Список ошибок.
+              items:
+                $ref: '#/components/schemas/ApiError'
+              type: array
+      required:
+        - errors
+      type: object
+    BarcodeFilterType:
+      description: Фильтр по штрих-коду
+      example: M000001-00001-1
+      type: string
+    CreateParcel:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/ParcelItem'
+          type: array
+      required:
+        - items
+      type: object
+    CustomerIdType:
+      description: Идентификатор покупателя
+      example: '437080'
+      type: string
+    CustomerOrderNumberType:
+      description: Клиентский номер заказа
+      example: M12345678-00001
+      type: string
+    DateTime:
+      description: Дата/время в формате RFC3339 с указанием часового пояса
+      example: '2024-08-24T14:15:22Z'
+      format: date-time
+      type: string
+    FilterDateTime:
+      anyOf:
+        - required:
+            - from
+        - required:
+            - to
+      description: >
+        Фильтр по временному интервалу. Необходимо передать хотя бы одно поле фильтра.
+
+
+        * from Начало интервала (включительно).
+
+        * to   Конец интервала (не включительно).
+
+      properties:
+        from:
+          $ref: '#/components/schemas/DateTime'
+        to:
+          $ref: '#/components/schemas/DateTime'
+      type: object
+    Order:
+      properties:
+        created_at:
+          allOf:
+            - $ref: '#/components/schemas/DateTime'
+          description: |
+            Дата и время создания заказа
+        customer_id:
+          $ref: '#/components/schemas/CustomerIdType'
+        customer_order_number:
+          $ref: '#/components/schemas/CustomerOrderNumberType'
+        cutoff_time:
+          allOf:
+            - $ref: '#/components/schemas/DateTime'
+          description: >
+            Дата и время, до которого необходимо собрать товары в посылки и привезти их на точку drop-off
+
+        delivery_region:
+          description: Регион доставки
+          example: Республика Татарстан
+          type: string
+        items:
+          description: |
+            Список товаров которые необходимо собрать
+          items:
+            $ref: '#/components/schemas/OrderItem'
+          type: array
+        order_id:
+          $ref: '#/components/schemas/OrderIdType'
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        warehouse_id:
+          $ref: '#/components/schemas/WarehouseIdType'
+      required:
+        - order_id
+        - warehouse_id
+        - status
+        - cutoff_time
+        - created_at
+        - customer_order_number
+        - customer_id
+        - delivery_region
+        - items
+      type: object
+    OrderCancelItemsRequest:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/SkuItem'
+          type: array
+        order_id:
+          $ref: '#/components/schemas/OrderIdType'
+      required:
+        - items
+        - order_id
+      type: object
+    OrderCancelItemsResponse:
+      properties:
+        order:
+          $ref: '#/components/schemas/Order'
+      required:
+        - order
+      type: object
+    OrderCancelRequest:
+      properties:
+        order_id:
+          $ref: '#/components/schemas/OrderIdType'
+      required:
+        - order_id
+      type: object
+    OrderCancelResponse:
+      type: object
+    OrderCompleteRequest:
+      properties:
+        order_id:
+          $ref: '#/components/schemas/OrderIdType'
+      required:
+        - order_id
+      type: object
+    OrderCompleteResponse:
+      properties:
+        parcels:
+          items:
+            $ref: '#/components/schemas/Parcel'
+          type: array
+      required:
+        - parcels
+      type: object
+    OrderIdType:
+      description: Идентификатор сборочного задания
+      maxLength: 36
+      type: string
+    OrderItem:
+      properties:
+        canceled_quantity:
+          description: Кол-во товаров которое было отменено при сборке.
+          example: 1
+          type: integer
+        financial_data:
+          $ref: '#/components/schemas/OrderItemFinancialData'
+        quantity:
+          description: >-
+            Кол-во единиц товара которое необходимо собрать.
+
+            Поле отражает актуальное кол-во товара которое необходимо собрать. Если производить отмену товаров, то значение в этом поле будет уменьшаться
+          example: 10
+          type: integer
+        sku_id:
+          $ref: '#/components/schemas/SkuIdType'
+      required:
+        - sku_id
+        - quantity
+        - financial_data
+      type: object
+    OrderItemFinancialData:
+      properties:
+        old_price:
+          description: >-
+            Старая цена товара. На текущий момент совпадает со значение в поле price.
+          example: 30
+          type: number
+        payment_price:
+          description: 'Цена единицы товара, которую заплатил покупатель.'
+          example: 30
+          type: number
+        price:
+          description: Цена единицы товара на витрине.
+          example: 30
+          type: number
+      required:
+        - old_price
+        - price
+        - payment_price
+      type: object
+    OrderParcelsRequest:
+      properties:
+        auto_complete_order:
+          description: |
+            Признак, что задание на сборку должно быть автоматически завершено,
+            без необходимости вызывать запрос "Подтверждение сборки"
+          example: false
+          type: boolean
+        order_id:
+          $ref: '#/components/schemas/OrderIdType'
+        parcels:
+          items:
+            $ref: '#/components/schemas/CreateParcel'
+          type: array
+      required:
+        - parcels
+        - order_id
+      type: object
+    OrderParcelsResponse:
+      properties:
+        parcels:
+          items:
+            $ref: '#/components/schemas/Parcel'
+          type: array
+      required:
+        - parcels
+      type: object
+    OrderStatus:
+      description: |
+        Статус сборочного задания
+
+        * NEW         - Новый
+        * IN_ASSEMBLY - Собирается
+        * ASSEMBLED   - Сборка завершена
+        * CANCELED    - Отменен
+      enum:
+        - NEW
+        - IN_ASSEMBLY
+        - ASSEMBLED
+        - CANCELED
+      type: string
+    OrdersListRequest:
+      allOf:
+        - $ref: '#/components/schemas/PaginationRequest'
+        - properties:
+            created_at:
+              $ref: '#/components/schemas/FilterDateTime'
+            customer_order_number:
+              description: Фильтр по клиентским номерам заказов
+              items:
+                $ref: '#/components/schemas/CustomerOrderNumberType'
+              maxItems: 50
+              minItems: 1
+              type: array
+            dir:
+              $ref: '#/components/schemas/SortDirection'
+            order_id:
+              items:
+                $ref: '#/components/schemas/OrderIdType'
+              maxItems: 50
+              minItems: 1
+              type: array
+            status:
+              $ref: '#/components/schemas/OrderStatus'
+            warehouse_id:
+              description: Фильтр по идентификаторам складов.
+              items:
+                $ref: '#/components/schemas/WarehouseIdType'
+              maxItems: 50
+              minItems: 1
+              type: array
+          type: object
+      required:
+        - dir
+        - created_at
+      type: object
+    OrdersListResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginationResponse'
+        - properties:
+            orders:
+              items:
+                $ref: '#/components/schemas/Order'
+              type: array
+          type: object
+      required:
+        - orders
+      type: object
+    OrdersUnprocessedRequest:
+      allOf:
+        - $ref: '#/components/schemas/PaginationRequest'
+        - properties:
+            created_at:
+              $ref: '#/components/schemas/FilterDateTime'
+            customer_order_number:
+              description: Фильтр по клиентским номерам заказов
+              items:
+                $ref: '#/components/schemas/CustomerOrderNumberType'
+              maxItems: 50
+              minItems: 1
+              type: array
+            cutoff_time:
+              $ref: '#/components/schemas/FilterDateTime'
+            dir:
+              $ref: '#/components/schemas/SortDirection'
+            warehouse_id:
+              description: Фильтр по идентификаторам складов.
+              items:
+                $ref: '#/components/schemas/WarehouseIdType'
+              maxItems: 50
+              minItems: 1
+              type: array
+          type: object
+      required:
+        - dir
+      type: object
+    OrdersUnprocessedResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginationResponse'
+        - properties:
+            orders:
+              items:
+                $ref: '#/components/schemas/Order'
+              type: array
+      required:
+        - orders
+      type: object
+    PaginationRequest:
+      properties:
+        page_size:
+          default: 100
+          description: Лимит кол-ва элементов в одном ответе
+          maximum: 1000
+          minimum: 1
+          type: integer
+        page_token:
+          description: >
+            В этом параметр необходимо передавать next_page_token из предыдущего ответа.
+
+            Если параметр не задан возвращается первая страница с результатами.
+
+          type: string
+      type: object
+    PaginationResponse:
+      properties:
+        next_page_token:
+          description: "Токен для получения следующей страницы. \nЕго необходимо передать в поле page_token в следующем запросе.\n"
+          type: string
+      type: object
+    Parcel:
+      properties:
+        barcode:
+          type: string
+        items:
+          items:
+            $ref: '#/components/schemas/ParcelItem'
+          type: array
+        parcel_id:
+          $ref: '#/components/schemas/ParcelIdType'
+      required:
+        - parcel_id
+        - barcode
+        - items
+      type: object
+    ParcelFullInfo:
+      properties:
+        barcode:
+          type: string
+        customer_order_number:
+          $ref: '#/components/schemas/CustomerOrderNumberType'
+        cutoff_time:
+          example: '2019-08-24T14:15:22.000Z'
+          format: date-time
+          type: string
+        items:
+          items:
+            $ref: '#/components/schemas/ParcelItem'
+          type: array
+        order_id:
+          $ref: '#/components/schemas/OrderIdType'
+        parcel_id:
+          $ref: '#/components/schemas/ParcelIdType'
+        status:
+          $ref: '#/components/schemas/ParcelStatus'
+        warehouse_id:
+          $ref: '#/components/schemas/WarehouseIdType'
+      required:
+        - parcel_id
+        - status
+        - barcode
+        - customer_order_number
+        - cutoff_time
+        - warehouse_id
+        - items
+      type: object
+    ParcelIdType:
+      description: Идентификатор посылки
+      maxLength: 36
+      type: string
+    ParcelItem:
+      properties:
+        identifiers:
+          items:
+            $ref: '#/components/schemas/SkuIdentifiers'
+          type: array
+        quantity:
+          minimum: 1
+          type: integer
+        sku_id:
+          $ref: '#/components/schemas/SkuIdType'
+      required:
+        - sku_id
+        - quantity
+      type: object
+    ParcelLabelItem:
+      properties:
+        barcode:
+          description: Штрих код посылки
+          type: string
+        parcel_id:
+          $ref: '#/components/schemas/ParcelIdType'
+      required:
+        - parcel_id
+        - barcode
+      type: object
+    ParcelMarkingItem:
+      properties:
+        identifiers:
+          items:
+            $ref: '#/components/schemas/SkuIdentifiers'
+          type: array
+        sku_id:
+          $ref: '#/components/schemas/SkuIdType'
+      required:
+        - sku_id
+        - identifiers
+      type: object
+    ParcelStatus:
+      description: "Статус посылки  \n* NEW                  - Новая\n* READY_TO_SHIPMENT    - Готов к отгрузке\n* AWAITING_DELIVERY    - Передается в доставку\n* DELIVERING           - В пути\n* RECEIVED             - Получен клиентом\n* CANCELED             - Отменен\n"
+      enum:
+        - NEW
+        - READY_TO_SHIPMENT
+        - AWAITING_DELIVERY
+        - DELIVERING
+        - RECEIVED
+        - CANCELED
+      type: string
+    ParcelsAddMarkingRequest:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/ParcelMarkingItem'
+          type: array
+        parcel_id:
+          $ref: '#/components/schemas/ParcelIdType'
+      required:
+        - parcel_id
+        - items
+      type: object
+    ParcelsAddMarkingResponse:
+      type: object
+    ParcelsCancelRequest:
+      properties:
+        parcel_id:
+          $ref: '#/components/schemas/ParcelIdType'
+      required:
+        - parcel_id
+      type: object
+    ParcelsCancelResponse:
+      properties: {}
+      type: object
+    ParcelsCreateRequest:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/ParcelItem'
+          type: array
+        order_id:
+          $ref: '#/components/schemas/OrderIdType'
+      required:
+        - order_id
+        - items
+      type: object
+    ParcelsCreateResponse:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/ParcelItem'
+          type: array
+        parcel_id:
+          $ref: '#/components/schemas/ParcelIdType'
+      type: object
+    ParcelsLabelsRequest:
+      properties:
+        parcel_id:
+          items:
+            $ref: '#/components/schemas/ParcelIdType'
+          maxItems: 50
+          minItems: 1
+          type: array
+      required:
+        - parcel_id
+      type: object
+    ParcelsLabelsResponse:
+      properties:
+        file_content:
+          description: PDF файл со всеми этикетками
+          example: |-
+            %PDF-1.3
+            3 0 obj
+            <</Type /Page
+            ...
+          type: string
+        parcels:
+          description: |
+            Информация о посылках
+          items:
+            $ref: '#/components/schemas/ParcelLabelItem'
+          type: array
+      required:
+        - parcels
+        - file_content
+      type: object
+    ParcelsListRequest:
+      allOf:
+        - $ref: '#/components/schemas/PaginationRequest'
+        - properties:
+            barcode:
+              description: Фильтр по штрих-коду посылок
+              items:
+                $ref: '#/components/schemas/BarcodeFilterType'
+              maxItems: 50
+              minItems: 1
+              type: array
+            created_at:
+              $ref: '#/components/schemas/FilterDateTime'
+            customer_order_number:
+              description: Фильтр по клиентским номерам заказов
+              items:
+                $ref: '#/components/schemas/CustomerOrderNumberType'
+              maxItems: 50
+              minItems: 1
+              type: array
+            cutoff_time:
+              $ref: '#/components/schemas/FilterDateTime'
+            dir:
+              $ref: '#/components/schemas/SortDirection'
+            order_id:
+              items:
+                $ref: '#/components/schemas/OrderIdType'
+              maxItems: 50
+              minItems: 1
+              type: array
+            parcel_id:
+              items:
+                $ref: '#/components/schemas/ParcelIdType'
+              maxItems: 50
+              minItems: 1
+              type: array
+            status:
+              $ref: '#/components/schemas/ParcelStatus'
+            warehouse_id:
+              description: Фильтр по идентификаторам складов.
+              items:
+                $ref: '#/components/schemas/WarehouseIdType'
+              maxItems: 50
+              minItems: 1
+              type: array
+          type: object
+      required:
+        - dir
+      type: object
+    ParcelsListResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginationResponse'
+        - properties:
+            parcels:
+              items:
+                $ref: '#/components/schemas/ParcelFullInfo'
+              type: array
+          type: object
+      type: object
+    ParcelsUnpackRequest:
+      properties:
+        parcel_id:
+          $ref: '#/components/schemas/ParcelIdType'
+      required:
+        - parcel_id
+      type: object
+    ParcelsUnpackResponse:
+      properties: {}
+      type: object
+    Shipment:
+      properties:
+        acceptance_completed_at:
+          description: Дата завершения приёмки
+          example: '2025-01-01T14:15:22.000Z'
+          format: date-time
+          nullable: true
+          type: string
+        acceptance_started_at:
+          description: Дата начала приёмки
+          example: '2025-01-01T12:05:33.000Z'
+          format: date-time
+          nullable: true
+          type: string
+        confirmed_at:
+          example: '2019-08-24T14:15:22.000Z'
+          format: date-time
+          type: string
+        created_at:
+          example: '2019-08-24T14:15:22.000Z'
+          format: date-time
+          type: string
+        delivery_date:
+          description: |
+            Плановая дата, когда отгрузка будет доставлена на точку drop-off.
+            Если не указана значит отгрузка ещё не подтверждена.
+          example: '2025-01-01'
+          format: date
+          nullable: true
+          type: string
+        parcels:
+          items:
+            $ref: '#/components/schemas/ShipmentParcelFull'
+          type: array
+        shipment_id:
+          $ref: '#/components/schemas/ShipmentIdType'
+        status:
+          $ref: '#/components/schemas/ShipmentStatus'
+        warehouse_id:
+          $ref: '#/components/schemas/WarehouseIdType'
+      required:
+        - shipment_id
+        - warehouse_id
+      type: object
+    ShipmentAddParcelsRequest:
+      properties:
+        parcel_id:
+          items:
+            $ref: '#/components/schemas/ParcelIdType'
+          maxItems: 100
+          minItems: 1
+          type: array
+      required:
+        - parcel_id
+      type: object
+    ShipmentAddParcelsResponse:
+      properties:
+        parcels:
+          items:
+            $ref: '#/components/schemas/ShipmentParcel'
+          type: array
+        shipment_id:
+          $ref: '#/components/schemas/ShipmentIdType'
+        warehouse_id:
+          $ref: '#/components/schemas/WarehouseIdType'
+      required:
+        - warehouse_id
+      type: object
+    ShipmentGetDocumentsRequest:
+      properties:
+        document_type:
+          description: "Тип запрашиваемого документа:\n             \n* act_of_acceptance — акт приема-передачи\n* act_of_mismatch — акт о расхождениях\n* delivery_note — лист отгрузки\n"
+          enum:
+            - act_of_acceptance
+            - act_of_mismatch
+            - delivery_note
+          type: string
+        shipment_id:
+          $ref: '#/components/schemas/ShipmentIdType'
+      required:
+        - shipment_id
+        - document_type
+      type: object
+    ShipmentGetDocumentsResponse:
+      properties:
+        file_content:
+          description: Содержимое документа в формате PDF
+          example: |
+            %PDF-1.3\n3 0 obj\n<</Type /Page\n...
+          type: string
+      required:
+        - file_content
+      type: object
+    ShipmentIdType:
+      description: Идентификатор отгрузки
+      maxLength: 36
+      type: string
+    ShipmentListRequest:
+      allOf:
+        - $ref: '#/components/schemas/PaginationRequest'
+        - properties:
+            confirmed_at:
+              $ref: '#/components/schemas/FilterDateTime'
+            created_at:
+              $ref: '#/components/schemas/FilterDateTime'
+            customer_order_number:
+              $ref: '#/components/schemas/CustomerOrderNumberType'
+            dir:
+              $ref: '#/components/schemas/SortDirection'
+            parcel_barcode:
+              $ref: '#/components/schemas/BarcodeFilterType'
+            parcel_id:
+              $ref: '#/components/schemas/ParcelIdType'
+            shipment_id:
+              items:
+                $ref: '#/components/schemas/ShipmentIdType'
+              maxItems: 50
+              minItems: 1
+              type: array
+            status:
+              $ref: '#/components/schemas/ShipmentStatus'
+            warehouse_id:
+              description: Фильтр по идентификаторам складов.
+              items:
+                $ref: '#/components/schemas/WarehouseIdType'
+              maxItems: 50
+              minItems: 1
+              type: array
+          type: object
+      required:
+        - dir
+      type: object
+    ShipmentListResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginationResponse'
+        - properties:
+            shipments:
+              items:
+                $ref: '#/components/schemas/Shipment'
+              type: array
+          type: object
+      type: object
+    ShipmentParcel:
+      properties:
+        barcode:
+          type: string
+        parcel_id:
+          $ref: '#/components/schemas/ParcelIdType'
+      required:
+        - parcel_id
+        - barcode
+      type: object
+    ShipmentParcelFull:
+      allOf:
+        - $ref: '#/components/schemas/ShipmentParcel'
+        - properties:
+            acceptance_result:
+              description: "Результат приёмки посылки в отгрузке. \n\n* ACCEPTED  — посылка принята в логистику.\n* NOT_FOUND — посылка не обнаружена при обработке отгрузки.\n* UNKNOWN   — отгрузка ещё не обработана\n"
+              enum:
+                - ACCEPTED
+                - NOT_FOUND
+                - UNKNOWN
+              type: string
+          required:
+            - acceptance_result
+          type: object
+      type: object
+    ShipmentRemoveParcelsRequest:
+      properties:
+        parcel_id:
+          items:
+            $ref: '#/components/schemas/ParcelIdType'
+          maxItems: 100
+          minItems: 1
+          type: array
+      required:
+        - parcel_id
+      type: object
+    ShipmentRemoveParcelsResponse:
+      properties:
+        parcels:
+          items:
+            $ref: '#/components/schemas/ShipmentParcel'
+          type: array
+        shipment_id:
+          $ref: '#/components/schemas/ShipmentIdType'
+      type: object
+    ShipmentStatus:
+      description: "Статус отгрузки \n* DRAFT                 — Формируется\n* CONFIRMED             — Подтверждена\n* ACCEPTANCE_STARTED    — Начата приемка отгрузки\n* ACCEPTANCE_COMPLETED  — Приемка отгрузки завершена\n* CANCELED              — Отменена\n"
+      enum:
+        - DRAFT
+        - CONFIRMED
+        - ACCEPTANCE_STARTED
+        - ACCEPTANCE_COMPLETED
+        - CANCELED
+      type: string
+    ShipmentsCancelRequest:
+      properties:
+        shipment_id:
+          $ref: '#/components/schemas/ShipmentIdType'
+      required:
+        - shipment_id
+      type: object
+    ShipmentsCancelResponse:
+      properties:
+        parcels:
+          items:
+            $ref: '#/components/schemas/ShipmentParcel'
+          type: array
+        shipment_id:
+          $ref: '#/components/schemas/ShipmentIdType'
+      required:
+        - shipment_id
+        - parcels
+      type: object
+    ShipmentsConfirmRequest:
+      description: >-
+        shipment_id либо warehouse_id нужно обязательно передавать если у участника есть несколько складов
+      properties:
+        delivery_date:
+          description: |
+            Плановая дата, когда отгрузка будет доставлена на точку drop-off
+          example: '2025-01-01'
+          format: date
+          type: string
+        shipment_id:
+          $ref: '#/components/schemas/ShipmentIdType'
+        warehouse_id:
+          $ref: '#/components/schemas/WarehouseIdType'
+      required:
+        - delivery_date
+      type: object
+    ShipmentsConfirmResponse:
+      properties:
+        parcels:
+          items:
+            $ref: '#/components/schemas/ShipmentParcel'
+          type: array
+        shipment_id:
+          $ref: '#/components/schemas/ShipmentIdType'
+        warehouse_id:
+          $ref: '#/components/schemas/WarehouseIdType'
+      required:
+        - warehouse_id
+      type: object
+    SkuIdType:
+      example: 4323435
+      format: int64
+      type: integer
+    SkuIdentifiers:
+      description: Идентификаторы для товара
+      properties:
+        cis:
+          description: Маркировка Честный знак
+          type: string
+        gtd:
+          description: Номер грузовой таможенной декларации (ГТД)
+          type: string
+        rnpt:
+          description: Регистрационный номер партии товара (РНПТ)
+          type: string
+        uin:
+          description: Уникальный идентификационный номер (УИН) ювелирного изделия
+          type: string
+      type: object
+    SkuItem:
+      properties:
+        quantity:
+          minimum: 1
+          type: integer
+        sku_id:
+          $ref: '#/components/schemas/SkuIdType'
+      required:
+        - sku_id
+        - quantity
+      type: object
+    SortDirection:
+      description: Направление сортировки
+      enum:
+        - ASC
+        - DESC
+      type: string
+    WarehouseIdType:
+      description: Идентификатор склада
+      example: 5f6f0334-0759-4e04-af31-8c5a4c4fa7b4
+      format: uuid
+      type: string
+    ApiErrorResponse1:
+      properties:
+        code:
+          description: Error code
+          type: string
+        detailMessage:
+          deprecated: true
+          type: string
+        message:
+          description: Error message
+          type: string
+        payload:
+          type: object
+      required:
+        - code
+        - message
+      type: object
+    CategoryCharacteristicsRequest:
+      properties:
+        category_ids:
+          description: >-
+            Список идентификаторов категорий, для которых необходимо получить характеристики. Обрабатываются только идентификаторы активных категорий - характеристики будут возвращены только для них.
+          example:
+            - 123123
+            - 123124
+          items:
+            description: >-
+              Список идентификаторов категорий, для которых необходимо получить характеристики. Обрабатываются только идентификаторы активных категорий - характеристики будут возвращены только для них.
+            format: int64
+            type: integer
+          type: array
+      required:
+        - category_ids
+      type: object
+    CharacteristicAttribute:
+      description: 'Список характеристик, связанных со словарем'
+      properties:
+        id:
+          description: Уникальный идентификатор характеристики
+          example: 101
+          format: int64
+          type: integer
+        title:
+          description: Название или заголовок характеристики
+          example: Цвет
+          type: string
+        value:
+          description: Значение характеристики
+          example: Красный
+          type: string
+      required:
+        - id
+        - title
+        - value
+      type: object
+    CreateSkuFilter:
+      description: Фильтры SKU
+      properties:
+        characteristic_id:
+          description: Идентификатор справочника
+          format: int64
+          type: integer
+        characteristic_values:
+          description: Массив значений фильтра
+          items:
+            $ref: '#/components/schemas/SkuFilterValue'
+          type: array
+      required:
+        - characteristic_id
+        - characteristic_values
+      type: object
+    CreateSkuRequest:
+      properties:
+        sku_list:
+          description: Массив со списком SKU
+          items:
+            $ref: '#/components/schemas/SkuRequest'
+          type: array
+      required:
+        - sku_list
+      type: object
+    CreateSkuResponse:
+      properties:
+        task_id:
+          description: >-
+            Идентификатор задачи создания СКУ. Используется для отслеживания статуса запроса.
+          example: 1234
+          format: int64
+          type: integer
+      type: object
+    CustomSkuCharacteristic:
+      properties:
+        characteristic_title:
+          description: 'Название характеристики. Ограничение: до 255 символов'
+          maxLength: 255
+          type: string
+        characteristic_value:
+          description: 'Значение характеристики. Ограничение: до 255 символов'
+          maxLength: 255
+          type: string
+      required:
+        - characteristic_title
+        - characteristic_value
+      type: object
+    DictionaryPagination:
+      description: Детали пагинации для ответа словаря
+      properties:
+        page:
+          description: Номер текущей страницы
+          example: 0
+          format: int32
+          minimum: 0
+          type: integer
+        page_size:
+          description: Количество элементов на странице
+          example: 10
+          format: int32
+          maximum: 50
+          type: integer
+      required:
+        - page
+        - page_size
+      type: object
+    DictionaryResponse:
+      properties:
+        characteristic_attributes:
+          description: 'Список характеристик, связанных со словарем'
+          items:
+            $ref: '#/components/schemas/CharacteristicAttribute'
+          type: array
+        characteristic_title:
+          description: 'Название характеристики, связанной со словарем'
+          example: Размер
+          type: string
+        dictionary_id:
+          description: Уникальный идентификатор словаря
+          example: 1
+          format: int64
+          type: integer
+        pagination:
+          $ref: '#/components/schemas/DictionaryPagination'
+        system_characteristic:
+          description: 'Флаг, указывающий, является ли характеристика системной'
+          example: true
+          type: boolean
+      required:
+        - characteristic_attributes
+        - characteristic_title
+        - dictionary_id
+        - pagination
+        - system_characteristic
+      type: object
+    ErrorInfo:
+      description: Список ошибок при обработке товаров
+      properties:
+        attribute_error:
+          description: 'Поле, в котором произошла ошибка'
+          type: string
+        message:
+          description: Текст ошибки
+          type: string
+        seller_sku_id:
+          description: Идентификатор СКУ в системе продавца
+          type: string
+        status:
+          description: Статус обработки СКУ
+          type: string
+      type: object
+    ExternalSellerCategoryDto:
+      properties:
+        category_id:
+          description: Уникальный идентификатор категории
+          example: 123
+          format: int64
+          type: integer
+        category_string_path:
+          description: >-
+            Полный путь категории, отображающий иерархию от родительской до текущей категории, разделённый '->'
+          example: Электроника -> Компьютеры -> Ноутбуки
+          type: string
+        category_title:
+          description: Название категории
+          example: Ноутбуки
+          type: string
+      required:
+        - category_id
+        - category_string_path
+        - category_title
+      type: object
+    ExternalSellerCharacteristicsDto:
+      properties:
+        category_id:
+          description: Уникальный идентификатор категории
+          example: 123
+          format: int64
+          type: integer
+        category_title:
+          description: Название категории
+          example: Ноутбуки
+          type: string
+        defined_characteristic:
+          description: Определённые характеристики категории
+          items:
+            $ref: '#/components/schemas/SkuCharacteristicCategoryDto'
+          type: array
+        product_filter:
+          description: 'Характеристики категории, используемые как фильтры для товаров'
+          items:
+            $ref: '#/components/schemas/SkuCharacteristicCategoryDto'
+          type: array
+        sku_filter:
+          description: 'Характеристики категории, используемые как фильтры для SKU'
+          items:
+            $ref: '#/components/schemas/SkuCharacteristicCategoryDto'
+          type: array
+      required:
+        - category_id
+        - category_title
+        - defined_characteristic
+        - product_filter
+      type: object
+    GenericResponse:
+      properties:
+        error:
+          example: 'null'
+          readOnly: true
+          type: string
+        errors:
+          items:
+            $ref: '#/components/schemas/ApiErrorResponse1'
+          type: array
+        payload:
+          description: Response payload
+          type: object
+        timestamp:
+          format: date-time
+          type: string
+        trace:
+          type: string
+      type: object
+    KeySetPagination:
+      description: KeySet пагинация
+      properties:
+        dir:
+          description: Направление сортировки
+          enum:
+            - ASC
+            - DESC
+          example: DESC
+          type: string
+        last_key:
+          description: >-
+            Идентификатор записи, с которого начинать чтение. Для получения следующей страницы используйте последний sku_id из предыдущего ответа
+          example: 0
+          format: int64
+          minimum: 0
+          type: integer
+        limit:
+          description: Максимальное количество возвращаемых данных
+          example: 25
+          format: int64
+          maximum: 1000
+          minimum: 1
+          type: integer
+      required:
+        - dir
+        - last_key
+        - limit
+      type: object
+    Pagination:
+      description: Пагинация
+      properties:
+        dir:
+          description: Направление сортировки
+          enum:
+            - ASC
+            - DESC
+          example: DESC
+          type: string
+        page:
+          description: Страница
+          example: 0
+          format: int64
+          minimum: 0
+          type: integer
+        page_size:
+          description: Количество записей на странице
+          example: 25
+          format: int64
+          maximum: 1000
+          minimum: 1
+          type: integer
+      required:
+        - dir
+        - page
+        - page_size
+      type: object
+    PriceDto:
+      description: Данные по ценам
+      properties:
+        currency_code:
+          description: Код валюты
+          example: RUB
+          type: string
+        old_price:
+          description: Цена товара без скидки
+          type: number
+        price:
+          description: Цена продажи
+          type: number
+        seller_sku_id:
+          description: Идентификатор sku в системе продавца
+          example: bdd8c471a3b0a3c1
+          type: string
+        sku_id:
+          description: Идентификатор sku (формирует ММ)
+          example: 121
+          format: int64
+          type: integer
+      required:
+        - currency_code
+        - price
+      type: object
+    PriceInfoFilter:
+      properties:
+        sellerSkuIds:
+          description: Список id в системе селлера
+          items:
+            description: Список id в системе селлера
+            maxLength: 2147483647
+            minLength: 1
+            type: string
+          maxItems: 1000
+          minItems: 0
+          type: array
+        skuIds:
+          description: Список id в системе ММ
+          items:
+            description: Список id в системе ММ
+            format: int64
+            type: integer
+          maxItems: 1000
+          minItems: 0
+          type: array
+      type: object
+    PriceInfoPagination:
+      properties:
+        dir:
+          enum:
+            - ASC
+            - DESC
+          type: string
+        page:
+          description: Страница (с нуля)
+          example: 0
+          format: int32
+          minimum: 0
+          type: integer
+        pageSize:
+          description: Количество записей на странице (1..1000)
+          example: 20
+          format: int32
+          maximum: 1000
+          minimum: 1
+          type: integer
+        sortBy:
+          enum:
+            - SKU_ID
+            - SELLER_SKU_ID
+          type: string
+      type: object
+    PriceInfoResponse:
+      description: Данные по ценам
+      properties:
+        commission_amount:
+          description: Размер комиссии за товар
+          type: number
+        commission_currency_code:
+          description: Код валюты комиссии
+          type: string
+        commission_percent:
+          description: Процент комиссии
+          format: int64
+          type: integer
+        currency_code:
+          description: Код валюты
+          type: string
+        old_price:
+          description: Цена товара без скидки
+          type: number
+        price:
+          description: Цена продажиа
+          type: number
+        seller_sku_id:
+          description: Идентификатор sku в системе продавца
+          example: bdd8c471a3b0a3c1
+          type: string
+        sku_id:
+          description: Идентификатор sku (формирует ММ)
+          example: 121
+          format: int64
+          type: integer
+        timestamp:
+          description: Дата последнего обновления
+          format: date-time
+          type: string
+      type: object
+    PriceInfoResponseItem:
+      properties:
+        oldPrice:
+          type: number
+        price:
+          type: number
+        sellerSkuId:
+          type: string
+        skuId:
+          format: int64
+          type: integer
+      type: object
+    PriceInfoV2Request:
+      properties:
+        filter:
+          $ref: '#/components/schemas/PriceInfoFilter'
+        pagination:
+          $ref: '#/components/schemas/PriceInfoPagination'
+      type: object
+    PriceInfoV2Response:
+      properties:
+        page:
+          format: int32
+          type: integer
+        size:
+          format: int32
+          type: integer
+        skuInfo:
+          items:
+            $ref: '#/components/schemas/PriceInfoResponseItem'
+          type: array
+        total:
+          format: int32
+          type: integer
+      type: object
+    PriceUpdateItem:
+      description: Массив цен
+      properties:
+        oldPrice:
+          type: number
+        price:
+          description: Цена продажи (рубли)
+          type: number
+        sellerSkuId:
+          type: string
+        skuId:
+          format: int64
+          type: integer
+      required:
+        - price
+      type: object
+    PriceUpdateResponse:
+      description: Данные по ценам с ошибками
+      properties:
+        currency_code:
+          description: Код валюты
+          example: RUB
+          type: string
+        error:
+          description: Описание ошибки
+          type: string
+        old_price:
+          description: Цена товара без скидки
+          type: number
+        price:
+          description: Цена продажи
+          type: number
+        seller_sku_id:
+          description: Идентификатор sku в системе продавца
+          example: bdd8c471a3b0a3c1
+          type: string
+        sku_id:
+          description: Идентификатор sku (формирует ММ)
+          example: 121
+          format: int64
+          type: integer
+      required:
+        - currency_code
+        - price
+      type: object
+    PriceUpdateResultItem:
+      properties:
+        oldPrice:
+          type: number
+        price:
+          type: number
+        sellerSkuId:
+          type: string
+        skuId:
+          format: int64
+          type: integer
+      type: object
+    PriceUpdateV2Request:
+      properties:
+        prices:
+          description: Массив цен
+          items:
+            $ref: '#/components/schemas/PriceUpdateItem'
+          maxItems: 1000
+          minItems: 1
+          type: array
+      required:
+        - prices
+      type: object
+    PriceUpdateV2Response:
+      properties:
+        result:
+          items:
+            $ref: '#/components/schemas/PriceUpdateResultItem'
+          type: array
+      type: object
+    PricesRequest:
+      description: Запрос на обновление данные по ценам
+      properties:
+        prices:
+          description: Массив цен
+          items:
+            $ref: '#/components/schemas/PriceDto'
+          type: array
+      required:
+        - prices
+      type: object
+    ProductDeleteRequest:
+      description: Запрос на удаление продуктов
+      properties:
+        product_ids:
+          description: Список идентификаторов продукта
+          items:
+            description: Список идентификаторов продукта
+            format: int64
+            type: integer
+          type: array
+      required:
+        - product_ids
+      type: object
+    ProductDeleteResponse:
+      properties:
+        error_msg:
+          description: 'Текст ошибки, полученной при попытке удаления продукта'
+          type: string
+        product_id:
+          description: Идентификатор продукта
+          format: int64
+          type: integer
+        success:
+          description: Флаг успешности удаления продукта
+          type: boolean
+      type: object
+    ProductVisualEffects:
+      description: Объект с URL архива.zip с фотографиями внутри в формате .jpg
+      properties:
+        url:
+          description: Конечный URL
+          type: string
+      required:
+        - url
+      type: object
+    ShopDto:
+      properties:
+        id:
+          description: Идентификатор магазина
+          example: 123
+          format: int64
+          type: integer
+        title:
+          description: Название магазина
+          example: Березка
+          type: string
+      type: object
+    ShortSkuInfo:
+      description: Данные по sku после маппинга
+      properties:
+        barcode:
+          description: Штрихкод SKU
+          format: int64
+          type: integer
+        product_id:
+          description: Идентификатор продукта
+          format: int64
+          type: integer
+        seller_sku_id:
+          description: Внешний идентификатор SKU
+          type: string
+        sku_id:
+          description: Внутренний идентификатор SKU
+          format: int64
+          type: integer
+      type: object
+    ShortSkuInfoFilter:
+      description: Фильтры для поиска по sku ID или external sku ID
+      properties:
+        seller_sku_ids:
+          description: Список идентификаторов СКУ в системе селлера
+          items:
+            description: Список идентификаторов СКУ в системе селлера
+            type: string
+          maxItems: 1000
+          minItems: 0
+          type: array
+        sku_ids:
+          description: Список внутренних идентификаторов СКУ
+          items:
+            description: Список внутренних идентификаторов СКУ
+            format: int64
+            type: integer
+          maxItems: 1000
+          minItems: 0
+          type: array
+      type: object
+    ShortSkuInfoRequest:
+      description: Запрос для получения компактной информации об СКУ
+      properties:
+        filters:
+          $ref: '#/components/schemas/ShortSkuInfoFilter'
+        pagination:
+          $ref: '#/components/schemas/KeySetPagination'
+      type: object
+    ShortSkuInfoResponse:
+      description: 'Ответ, содержащий компактную информацию по найденным СКУ'
+      properties:
+        result:
+          description: Массив найденных СКУ
+          items:
+            $ref: '#/components/schemas/ShortSkuInfo'
+          type: array
+        result_count:
+          description: Количество найденных СКУ
+          format: int32
+          type: integer
+        shop_id:
+          description: Идентификатор магазина
+          format: int64
+          type: integer
+      type: object
+    SkuArchiveRequest:
+      properties:
+        seller_sku_ids:
+          description: Список идентификаторов СКУ в системе селлера
+          items:
+            description: Список идентификаторов СКУ в системе селлера
+            type: string
+          type: array
+        sku_ids:
+          description: Список внутренних идентификаторов СКУ
+          items:
+            description: Список внутренних идентификаторов СКУ
+            format: int64
+            type: integer
+          type: array
+      type: object
+    SkuArchiveResponse:
+      properties:
+        error_msg:
+          type: string
+        seller_sku_id:
+          description: Идентификатор sku в системе продавца
+          example: bdd8c471a3b0a3c1
+          type: string
+        sku_id:
+          description: Идентификатор sku (формирует ММ)
+          example: 121
+          format: int64
+          type: integer
+        success:
+          type: boolean
+      type: object
+    SkuCharacteristic:
+      description: 'Характеристики, относящиеся к Продукту'
+      properties:
+        characteristic_id:
+          description: Идентификатор справочника
+          format: int64
+          type: integer
+        characteristic_value:
+          description: Значение характеристики
+          type: string
+      required:
+        - characteristic_id
+        - characteristic_value
+      type: object
+    SkuCharacteristicCategoryDto:
+      description: 'Характеристики категории, используемые как фильтры для SKU'
+      properties:
+        characteristic_title:
+          description: Название характеристики
+          example: Цвет
+          type: string
+        dictionary_id:
+          description: Уникальный идентификатор характеристики
+          example: 101
+          format: int64
+          type: integer
+        extendable_values:
+          description: 'Признак того, что значения фильтра SKU могут быть расширены'
+          example: true
+          type: boolean
+        input_type:
+          description: Тип ввода значения фильтра для SKU
+          enum:
+            - RANGED_VALUE
+            - SINGLE_CHOICE
+            - MULTIPLE_CHOICE
+          example: SINGLE_CHOICE
+          type: string
+        max_allowed_values:
+          description: Максимально допустимое количество значений для фильтра SKU
+          example: 5
+          format: int32
+          type: integer
+        required:
+          description: Признак обязательности заполнения характеристики
+          example: true
+          type: boolean
+        system_characteristic:
+          description: >-
+            Признак того, что характеристика является системной (true) или фильтрующей (false)
+          example: true
+          type: boolean
+        type:
+          description: Тип характеристики
+          enum:
+            - DEFINED
+            - PRODUCT
+            - SKU
+          example: DEFINED
+          type: string
+      required:
+        - characteristic_title
+        - dictionary_id
+        - required
+        - system_characteristic
+        - type
+      type: object
+    SkuDimensions:
+      description: ВГХ SKU
+      properties:
+        height:
+          description: Высота в мм
+          format: int32
+          type: integer
+        length:
+          description: Длина в мм
+          format: int32
+          type: integer
+        weight:
+          description: Вес в граммах
+          format: int32
+          type: integer
+        width:
+          description: Ширина в мм
+          format: int32
+          type: integer
+      required:
+        - height
+        - length
+        - weight
+        - width
+      type: object
+    SkuFilter:
+      description: Фильтр SKU
+      properties:
+        seller_sku_ids:
+          description: Список идентификаторов СКУ в системе селлера
+          items:
+            description: Список идентификаторов СКУ в системе селлера
+            type: string
+          type: array
+        sku_ids:
+          description: Список внутренних идентификаторов СКУ
+          items:
+            description: Список внутренних идентификаторов СКУ
+            format: int64
+            type: integer
+          type: array
+      type: object
+    SkuFilterValue:
+      description: Массив значений фильтра
+      properties:
+        characteristic_value:
+          description: Значение фильтра
+          type: string
+      required:
+        - characteristic_value
+      type: object
+    SkuInfo:
+      description: Информация о SKU
+      properties:
+        barcode:
+          description: Штрихкод
+          format: int64
+          type: integer
+        category_id:
+          description: Идентификатор категории
+          format: int64
+          type: integer
+        certificate:
+          description: Сертификат
+          type: string
+        composition:
+          description: Состав
+          type: string
+        custom_characteristic_values_skus:
+          description: Пользовательские характеристики SKU
+          items:
+            $ref: '#/components/schemas/CustomSkuCharacteristic'
+          type: array
+        description:
+          description: Описание
+          type: string
+        height:
+          description: Высота в мм
+          format: int64
+          type: integer
+        instruction:
+          description: Инструкция
+          type: string
+        is_active:
+          description: Признак активности
+          type: boolean
+        is_archive:
+          description: Признак архивности
+          type: boolean
+        is_blocked:
+          description: Признак блокировки
+          type: boolean
+        is_no_stock:
+          description: Признак отсутствия на складе
+          type: boolean
+        length:
+          description: Длина в мм (приоритетное поле)
+          format: int64
+          type: integer
+        okpd2:
+          description: Код ОКПД2
+          type: string
+        photo_360:
+          $ref: '#/components/schemas/ProductVisualEffects'
+        product_attributes:
+          description: Свойства товара
+          items:
+            description: Свойства товара
+            type: string
+          type: array
+        product_filters_list:
+          description: 'Список характеристик, относящихся к продукту'
+          items:
+            $ref: '#/components/schemas/SkuCharacteristic'
+          type: array
+        product_id:
+          description: Идентификатор карточки товара
+          format: int64
+          type: integer
+        product_images:
+          description: Изображения продукта
+          items:
+            $ref: '#/components/schemas/ProductVisualEffects'
+          type: array
+        seller_sku_id:
+          description: Идентификатор SKU в системе селлера
+          type: string
+        size_chart:
+          description: Таблица размеров
+          type: string
+        sku_characteristic_list:
+          description: Список характеристик SKU
+          items:
+            $ref: '#/components/schemas/SkuCharacteristic'
+          type: array
+        sku_id:
+          description: Идентификатор SKU
+          format: int64
+          type: integer
+        title:
+          description: Название
+          type: string
+        vat:
+          description: Ставка НДС
+          type: string
+        video:
+          $ref: '#/components/schemas/ProductVisualEffects'
+        weight:
+          description: Вес в граммах
+          format: int64
+          type: integer
+        width:
+          description: Ширина в мм
+          format: int64
+          type: integer
+      required:
+        - barcode
+        - category_id
+        - description
+        - height
+        - is_active
+        - is_archive
+        - is_blocked
+        - is_no_stock
+        - length
+        - okpd2
+        - product_id
+        - product_images
+        - seller_sku_id
+        - sku_id
+        - title
+        - vat
+        - weight
+        - width
+      type: object
+    SkuInfoRequest:
+      description: Запрос на получение данных по SKU
+      properties:
+        filter:
+          $ref: '#/components/schemas/SkuFilter'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+        - pagination
+      type: object
+    SkuInfoResponsePriceInfoResponse:
+      description: Ответ на запрос данных по остаткам
+      properties:
+        result:
+          items:
+            $ref: '#/components/schemas/PriceInfoResponse'
+          type: array
+      type: object
+    SkuInfoResponsePriceUpdateResponse:
+      description: Ответ на запрос данных по остаткам
+      properties:
+        result:
+          items:
+            $ref: '#/components/schemas/PriceUpdateResponse'
+          type: array
+      type: object
+    SkuInfoResponseProductDeleteResponse:
+      description: Ответ на запрос данных по остаткам
+      properties:
+        result:
+          items:
+            $ref: '#/components/schemas/ProductDeleteResponse'
+          type: array
+      type: object
+    SkuInfoResponseSkuArchiveResponse:
+      description: Ответ на запрос данных по остаткам
+      properties:
+        result:
+          items:
+            $ref: '#/components/schemas/SkuArchiveResponse'
+          type: array
+      type: object
+    SkuInfoResponseStockInfoResponse:
+      description: Ответ на запрос данных по остаткам
+      properties:
+        result:
+          items:
+            $ref: '#/components/schemas/StockInfoResponse'
+          type: array
+      type: object
+    SkuListRequest:
+      description: Запрос на получение списка SKU
+      properties:
+        filter:
+          $ref: '#/components/schemas/SkuRequestFilter'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+        - pagination
+      type: object
+    SkuListResponse:
+      description: Ответ со списком SKU
+      properties:
+        result:
+          description: Список найденных SKU
+          items:
+            $ref: '#/components/schemas/SkuInfo'
+          type: array
+      required:
+        - result
+      type: object
+    SkuRequest:
+      description: Массив со списком SKU
+      properties:
+        barcode:
+          description: >-
+            Штрихкод SKU, в случае если он не будет передан Магнит Маркет создаст его
+          format: int64
+          type: integer
+        category_id:
+          description: Идентификатор категории
+          format: int64
+          type: integer
+        certificate:
+          description: 'Сертификаты, конечный URL файла в jpg, png, pdf'
+          type: string
+        composition:
+          description: 'Состав товара: конечный URL файла в jpg, png, pdf'
+          type: string
+        currency_code:
+          description: 'Валюта цен. Возможные значения: RUB — российский рубль'
+          type: string
+        custom_characteristic_values_skus:
+          description: >-
+            Пользовательские характеристики sku для объединения SKU в одну карточку товара. Ограничение: до 3 характеристик
+          items:
+            $ref: '#/components/schemas/CustomSkuCharacteristic'
+          maxItems: 3
+          type: array
+        defined_characteristic_list:
+          description: Предопределенные характеристики
+          items:
+            $ref: '#/components/schemas/SkuCharacteristic'
+          type: array
+        description:
+          description: 'Описание, единое для карточки товара. Ограничение: до 6000 символов'
+          maxLength: 6000
+          type: string
+        height:
+          description: Высота в мм
+          format: int32
+          type: integer
+        instruction:
+          description: 'Инструкция по уходу и применению: конечный URL файла в jpg, png, pdf'
+          type: string
+        length:
+          description: Длина в мм
+          format: int32
+          type: integer
+        okpd2:
+          description: Общероссийский классификатор продукции
+          type: string
+        old_price:
+          description: Цена товара без скидки (зачеркнутая)
+          format: int32
+          type: integer
+        photo360:
+          $ref: '#/components/schemas/ProductVisualEffects'
+        price:
+          description: Цена продажи (возможна скидка)
+          format: int32
+          type: integer
+        product_attributes:
+          description: 'Свойства товара. Ограничение: до 10 свойств'
+          items:
+            type: string
+          maxItems: 10
+          type: array
+        product_filters_list:
+          description: 'Характеристики, относящиеся к Продукту'
+          items:
+            $ref: '#/components/schemas/SkuCharacteristic'
+          type: array
+        product_images:
+          description: >-
+            Массив объектов с URL файлов в jpg, png, pdf с фото товаров; может быть несколько фото (до 10 штук)
+          items:
+            $ref: '#/components/schemas/ProductVisualEffects'
+          maxItems: 10
+          minItems: 1
+          type: array
+        seller_sku_id:
+          description: >-
+            Уникальный идентификатор SKU в системе селлера. Длина: до 80 символов. Допустимые символы: латиница (a-zA-Z), кириллица (а-яА-Я, кроме ёЁ), цифры (0-9), некоторые специальные символы .,\/()[]-=_.
+          type: string
+        shop_id:
+          description: Идентификатор магазина
+          format: int64
+          type: integer
+        short_description:
+          description: >-
+            Краткое описание, единое для карточки товара. Ограничение: до 390 символов
+          maxLength: 390
+          type: string
+        size_chart:
+          description: 'Конечный URL файла с размерной сеткой в jpg, png, pdf'
+          type: string
+        sku_filter_list:
+          description: Фильтры SKU
+          items:
+            $ref: '#/components/schemas/CreateSkuFilter'
+          type: array
+        sku_group_id:
+          description: >-
+            Идентификатор группы SKU. Укажите одинаковые значения для всех SKU, которые должны быть объединены в одну карточку товара.Формат: длина не более 50 символов, a-zA-Z0-9, а-яА-Я0-9 (кроме ёЁ), допустимы специальные символы .,\/()[]-=_.
+          maxLength: 50
+          type: string
+        title:
+          description: >-
+            Название, единое для карточки товара. Ограничение: от 3 до 90 символов
+          maxLength: 90
+          minLength: 3
+          type: string
+        vat:
+          description: 'НДС. Возможные значения: 0, 5, 7, 10, 22, "Не облагается"'
+          type: string
+        video:
+          $ref: '#/components/schemas/ProductVisualEffects'
+        weight:
+          description: Вес в граммах
+          format: int32
+          type: integer
+        width:
+          description: Ширина в мм
+          format: int32
+          type: integer
+      required:
+        - category_id
+        - currency_code
+        - description
+        - height
+        - length
+        - price
+        - product_filters_list
+        - product_images
+        - seller_sku_id
+        - shop_id
+        - short_description
+        - sku_group_id
+        - title
+        - vat
+        - weight
+        - width
+      type: object
+    SkuRequestFilter:
+      description: Фильтр для поиска SKU
+      properties:
+        category_id:
+          description: Идентификатор категории
+          format: int32
+          type: integer
+        shop_id:
+          description: Идентификатор магазина
+          format: int32
+          type: integer
+      type: object
+    SkuWarning:
+      description: Расшифровка по незначительным ошибкам
+      properties:
+        attributes:
+          description: Блок с расшифровкой незначительных ошибок при обновлении sku
+          items:
+            $ref: '#/components/schemas/SkuWarningAttribute'
+          type: array
+        seller_sku_id:
+          description: SKU id продавца
+          type: string
+        status:
+          description: Статус конкретного sku
+          type: string
+      required:
+        - attributes
+        - seller_sku_id
+        - status
+      type: object
+    SkuWarningAttribute:
+      description: Расшифровка по незначительным ошибкам
+      properties:
+        attribute:
+          description: Проблемный атрибут
+          type: string
+        message:
+          description: Предупреждение
+          type: string
+      required:
+        - attribute
+        - message
+      type: object
+    StockDto:
+      description: Данные по остаткам на складе продавца
+      properties:
+        seller_sku_id:
+          description: Идентификатор sku в системе продавца
+          example: bdd8c471a3b0a3c1
+          type: string
+        sku_id:
+          description: Идентификатор sku (формирует ММ)
+          example: 121
+          format: int64
+          type: integer
+        stock:
+          description: Остаток на складе селлера
+          example: 1
+          format: int64
+          type: integer
+        warehouse_id:
+          description: Идентификатор склада (формирует ММ)
+          example: bdd8c471-3dc8-4dd0-a544-30b5a3b0a3c1
+          format: uuid
+          type: string
+      required:
+        - stock
+        - warehouse_id
+      type: object
+    StockInfoDetails:
+      description: Детальные данные по остаткам
+      properties:
+        reserved:
+          description: Количество зарезервированных товаров на складе
+          example: 3
+          format: int64
+          type: integer
+        stock:
+          description: Количество товара
+          example: 120
+          format: int64
+          type: integer
+        type:
+          description: Тип склада
+          example: FBS
+          type: string
+      type: object
+    StockInfoResponse:
+      description: Данные по остаткам
+      properties:
+        seller_sku_id:
+          description: Идентификатор sku в системе продавца
+          example: 30b5a3b0a3c1
+          type: string
+        sku_id:
+          description: Идентификатор sku (формирует ММ)
+          example: 11
+          format: int64
+          type: integer
+        stock_info_details:
+          items:
+            $ref: '#/components/schemas/StockInfoDetails'
+          type: array
+      type: object
+    StockRequest:
+      description: Запрос на обновление данные по остаткам
+      properties:
+        stocks:
+          description: Список объектов с данными об остатках
+          items:
+            $ref: '#/components/schemas/StockDto'
+          type: array
+      required:
+        - stocks
+      type: object
+    TaskStatusResponse:
+      properties:
+        count_error:
+          description: Количество неуспешно созданных SKU
+          format: int32
+          type: integer
+        count_warning:
+          description: Количество предупреждений
+          format: int32
+          type: integer
+        error:
+          description: Список ошибок при обработке товаров
+          items:
+            $ref: '#/components/schemas/ErrorInfo'
+          type: array
+        status:
+          description: >-
+            Статус выполнения задачи: CREATED - создана, IN_PROGRESS - выполняется, CANCELLED - отменена, COMPLETED - завершена
+          enum:
+            - CREATED
+            - IN_PROGRESS
+            - CANCELLED
+            - COMPLETED
+          type: string
+        total_upload:
+          description: Количество успешно загруженных товаров
+          format: int32
+          type: integer
+        warnings:
+          description: Список предупреждений
+          items:
+            $ref: '#/components/schemas/SkuWarning'
+          type: array
+      type: object
+    UpdateSkuDto:
+      properties:
+        barcode:
+          description: Штрихкод SKU
+          format: int64
+          type: integer
+        dimensions:
+          $ref: '#/components/schemas/SkuDimensions'
+        seller_sku_id:
+          description: >-
+            Уникальный идентификатор SKU в системе селлера. Длина: до 80 символов. Допустимые символы: латиница (a-zA-Z), кириллица (а-яА-Я, кроме ёЁ), цифры (0-9), некоторые специальные символы .,\/()[]-=_.
+          type: string
+        sku_filter_list:
+          description: Фильтры SKU
+          items:
+            $ref: '#/components/schemas/UpdateSkuFilter'
+          type: array
+      required:
+        - seller_sku_id
+      type: object
+    UpdateSkuFilter:
+      description: Фильтры SKU
+      properties:
+        characteristic_id:
+          description: Идентификатор справочника
+          format: int64
+          type: integer
+        characteristic_values:
+          description: Массив значений фильтра
+          items:
+            description: Массив значений фильтра
+            type: string
+          type: array
+          uniqueItems: true
+      required:
+        - characteristic_id
+        - characteristic_values
+      type: object
+    UpdateSkuRequest:
+      properties:
+        sku_list:
+          items:
+            $ref: '#/components/schemas/UpdateSkuDto'
+          type: array
+      type: object
+  responses:
+    '400':
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiErrorResponse'
+      description: Запрос содержит неправильные данные
+    '403':
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiErrorResponse'
+            type: object
+      description: Нет доступа к запрашиваемому ресурсу
+    '404':
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiErrorResponse'
+            type: object
+      description: Запрашиваемый ресурс не найдет
+    '500':
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiErrorResponse'
+            type: object
+      description: Внутренняя ошибка сервера
+  parameters:
+    DocumentAccept:
+      description: |
+        Выбранный формат получения ответа (по умолчанию application/json)
+      in: header
+      name: Accept
+      required: false
+      schema:
+        default: application/json
+        enum:
+          - application/json
+          - application/pdf
+        type: string
