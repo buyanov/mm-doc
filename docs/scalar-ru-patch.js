@@ -27,7 +27,7 @@
 
         // Словарь. Ключи — как встречаются в UI (в точности/частично).
         dict: new Map([
-            ["Introduction", "Magnit Market Partner API"],
+            ["Introduction", "Magnit Market API"],
             ["Search", "Поиск"],
             ["Server", "Сервер"],
             ["Authentication", "Авторизация"],

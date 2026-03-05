@@ -2,17 +2,15 @@ openapi: 3.0.3
 info:
   title: Magnit Market API
   description: >
-    Magnit Market API. <br/>
+    API для партнёров Magnit Market. Позволяет управлять товарами, ценами и остатками, а также собирать и отгружать заказы. <br/>
 
-    Сервис Партнера выступает в роли клиента запрашивает данные о ресурсах, создает и обновляет сущности. <br/>
-
-    Авторизация выполняется через заголовок X-Api-Key.
+    Доступ к API осуществляется по ключу, передаваемому в заголовке X-Api-Key.
 
   version: 0.1.38
 servers:
-  - url: 'https://b2b-api.magnit.ru/api'
+  - url: 'https://b2b-api.magnit.ru'
     description: Основной стенд интеграции.
-  - url: 'https://b2b-api-gateway.uat.ya.magnit.ru/api'
+  - url: 'https://b2b-api-gateway.uat.ya.magnit.ru'
     description: Демо стенд для проведения тестирования процессинга заказов.
 security:
   - apiKeyAuth: []
