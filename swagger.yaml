@@ -21,8 +21,6 @@ tags:
     description: Magnit Market API. Категории
   - name: Цены
     description: Magnit Market API. Цены
-  - name: Цены (v2)
-    description: Magnit Market API. Цены (v2)
   - name: Остатки
     description: Magnit Market API. Товары
   - name: Магазины
@@ -686,34 +684,6 @@ paths:
         scopes:
           - 'mm:b2b:categories'
           - 'mm:b2b:all'
-  /api/seller/v1/empty_shops:
-    get:
-      description: REST эндпоинт для получения списка активных магазинов
-      responses:
-        '200':
-          content:
-            '*/*':
-              schema:
-                items:
-                  $ref: '#/components/schemas/ShopDto'
-                type: array
-          description: OK
-        '400':
-          content:
-            application/json:
-              schema:
-                type: string
-          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
-      security:
-        - apiKeyAuth: []
-      summary: Получение списка магазинов
-      tags:
-        - Категории
-      x-gateway:
-        auth: api_key
-        scopes:
-          - 'mm:b2b:all'
-          - 'mm:b2b:shops'
   /api/seller/v1/products/defined-characteristics:
     post:
       description: REST эндпоинт для получения списка характеристик
@@ -1259,84 +1229,6 @@ paths:
         scopes:
           - 'mm:b2b:all'
           - 'mm:b2b:shops'
-  '/api/seller/v2/{shopId}/products/sku/price':
-    post:
-      description: REST эндпоинт для массового обновления цен SKU
-      parameters:
-        - in: path
-          name: shopId
-          required: true
-          schema:
-            format: int64
-            type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PriceUpdateV2Request'
-        required: true
-      responses:
-        '200':
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/PriceUpdateV2Response'
-          description: OK
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GenericResponse'
-          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
-      security:
-        - apiKeyAuth: []
-      summary: Обновление цен SKU (v2)
-      tags:
-        - Цены (v2)
-      x-gateway:
-        auth: api_key
-        scopes:
-          - 'mm:b2b:prices'
-          - 'mm:b2b:all'
-  '/api/seller/v2/{shopId}/products/sku/price/info':
-    post:
-      description: REST эндпоинт для получения цен SKU
-      parameters:
-        - in: path
-          name: shopId
-          required: true
-          schema:
-            format: int64
-            type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PriceInfoV2Request'
-        required: true
-      responses:
-        '200':
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/PriceInfoV2Response'
-          description: OK
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GenericResponse'
-          description: Пример ошибочных ответов для всех http-статусов (не 2хх)
-      security:
-        - apiKeyAuth: []
-      summary: Получение цен SKU (v2)
-      tags:
-        - Цены (v2)
-      x-gateway:
-        auth: api_key
-        scopes:
-          - 'mm:b2b:prices'
-          - 'mm:b2b:all'
 components:
   securitySchemes:
     apiKeyAuth:
@@ -1714,7 +1606,7 @@ components:
         customer_order_number:
           $ref: '#/components/schemas/CustomerOrderNumberType'
         cutoff_time:
-          example: '2019-08-24T14:15:22.000Z'
+          example: '2019-08-24T14:15:22'
           format: date-time
           type: string
         items:
@@ -1939,22 +1831,22 @@ components:
       properties:
         acceptance_completed_at:
           description: Дата завершения приёмки
-          example: '2025-01-01T14:15:22.000Z'
+          example: '2025-01-01T14:15:22'
           format: date-time
           nullable: true
           type: string
         acceptance_started_at:
           description: Дата начала приёмки
-          example: '2025-01-01T12:05:33.000Z'
+          example: '2025-01-01T12:05:33'
           format: date-time
           nullable: true
           type: string
         confirmed_at:
-          example: '2019-08-24T14:15:22.000Z'
+          example: '2019-08-24T14:15:22'
           format: date-time
           type: string
         created_at:
-          example: '2019-08-24T14:15:22.000Z'
+          example: '2019-08-24T14:15:22'
           format: date-time
           type: string
         delivery_date:
@@ -2545,54 +2437,6 @@ components:
         - currency_code
         - price
       type: object
-    PriceInfoFilter:
-      properties:
-        sellerSkuIds:
-          description: Список id в системе селлера
-          items:
-            description: Список id в системе селлера
-            maxLength: 2147483647
-            minLength: 1
-            type: string
-          maxItems: 1000
-          minItems: 0
-          type: array
-        skuIds:
-          description: Список id в системе ММ
-          items:
-            description: Список id в системе ММ
-            format: int64
-            type: integer
-          maxItems: 1000
-          minItems: 0
-          type: array
-      type: object
-    PriceInfoPagination:
-      properties:
-        dir:
-          enum:
-            - ASC
-            - DESC
-          type: string
-        page:
-          description: Страница (с нуля)
-          example: 0
-          format: int32
-          minimum: 0
-          type: integer
-        pageSize:
-          description: Количество записей на странице (1..1000)
-          example: 20
-          format: int32
-          maximum: 1000
-          minimum: 1
-          type: integer
-        sortBy:
-          enum:
-            - SKU_ID
-            - SELLER_SKU_ID
-          type: string
-      type: object
     PriceInfoResponse:
       description: Данные по ценам
       properties:
@@ -2629,57 +2473,6 @@ components:
           format: date-time
           type: string
       type: object
-    PriceInfoResponseItem:
-      properties:
-        oldPrice:
-          type: number
-        price:
-          type: number
-        sellerSkuId:
-          type: string
-        skuId:
-          format: int64
-          type: integer
-      type: object
-    PriceInfoV2Request:
-      properties:
-        filter:
-          $ref: '#/components/schemas/PriceInfoFilter'
-        pagination:
-          $ref: '#/components/schemas/PriceInfoPagination'
-      type: object
-    PriceInfoV2Response:
-      properties:
-        page:
-          format: int32
-          type: integer
-        size:
-          format: int32
-          type: integer
-        skuInfo:
-          items:
-            $ref: '#/components/schemas/PriceInfoResponseItem'
-          type: array
-        total:
-          format: int32
-          type: integer
-      type: object
-    PriceUpdateItem:
-      description: Массив цен
-      properties:
-        oldPrice:
-          type: number
-        price:
-          description: Цена продажи (рубли)
-          type: number
-        sellerSkuId:
-          type: string
-        skuId:
-          format: int64
-          type: integer
-      required:
-        - price
-      type: object
     PriceUpdateResponse:
       description: Данные по ценам с ошибками
       properties:
@@ -2708,37 +2501,6 @@ components:
       required:
         - currency_code
         - price
-      type: object
-    PriceUpdateResultItem:
-      properties:
-        oldPrice:
-          type: number
-        price:
-          type: number
-        sellerSkuId:
-          type: string
-        skuId:
-          format: int64
-          type: integer
-      type: object
-    PriceUpdateV2Request:
-      properties:
-        prices:
-          description: Массив цен
-          items:
-            $ref: '#/components/schemas/PriceUpdateItem'
-          maxItems: 1000
-          minItems: 1
-          type: array
-      required:
-        - prices
-      type: object
-    PriceUpdateV2Response:
-      properties:
-        result:
-          items:
-            $ref: '#/components/schemas/PriceUpdateResultItem'
-          type: array
       type: object
     PricesRequest:
       description: Запрос на обновление данные по ценам
