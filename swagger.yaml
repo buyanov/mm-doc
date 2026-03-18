@@ -30,25 +30,24 @@ tags:
   - name: Отгрузка посылок
     description: Magnit Market API. Отгрузка посылок
 paths:
-  /api/seller/v1/orders/cancel:
+  /api/seller/v1/orders/list/unprocessed:
     post:
-      description: |
-        ⚠️ Задание может быть отменено, до перевода в статус ASSEMBLED.
+      description: >
+        Возвращает список необработанных заданий на сборку за указанный период времени.
 
-        ⚠️ Это действие нельзя отменить.
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OrderCancelRequest'
+              $ref: '#/components/schemas/OrdersUnprocessedRequest'
         required: true
       responses:
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderCancelResponse'
-          description: Запрос успешно выполнен
+                $ref: '#/components/schemas/OrdersUnprocessedResponse'
+          description: Список заданий на сборку
         '400':
           $ref: '#/components/responses/400'
         '403':
@@ -57,7 +56,40 @@ paths:
           $ref: '#/components/responses/404'
         '500':
           $ref: '#/components/responses/500'
-      summary: Отмена задания на сборку
+      summary: Список необработанных заданий на сборку
+      tags:
+        - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/orders/list:
+    post:
+      description: |
+        Возвращает список заданий на сборку за указанный период времени.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdersListRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersListResponse'
+          description: Список заданий на сборку
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Список заданий на сборку
       tags:
         - Задания на сборку
       x-gateway:
@@ -90,6 +122,41 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       summary: Отмена части товаров
+      tags:
+        - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/orders/cancel:
+    post:
+      description: |
+        ⚠️ Задание может быть отменено, до перевода в статус ASSEMBLED.
+
+        ⚠️ Это действие нельзя отменить.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCancelRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCancelResponse'
+          description: Запрос успешно выполнен
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Отмена задания на сборку
       tags:
         - Задания на сборку
       x-gateway:
@@ -131,73 +198,6 @@ paths:
         scopes:
           - 'mm:b2b:all'
           - 'mm:b2b:orders-processing'
-  /api/seller/v1/orders/list:
-    post:
-      description: |
-        Возвращает список заданий на сборку за указанный период времени.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OrdersListRequest'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrdersListResponse'
-          description: Список заданий на сборку
-        '400':
-          $ref: '#/components/responses/400'
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '500':
-          $ref: '#/components/responses/500'
-      summary: Список заданий на сборку
-      tags:
-        - Задания на сборку
-      x-gateway:
-        auth: api_key
-        scopes:
-          - 'mm:b2b:all'
-          - 'mm:b2b:orders-processing'
-  /api/seller/v1/orders/list/unprocessed:
-    post:
-      description: >
-        Возвращает список необработанных заданий на сборку за указанный период времени.
-
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OrdersUnprocessedRequest'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrdersUnprocessedResponse'
-          description: Список заданий на сборку
-        '400':
-          $ref: '#/components/responses/400'
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '500':
-          $ref: '#/components/responses/500'
-      summary: Список необработанных заданий на сборку
-      tags:
-        - Задания на сборку
-      x-gateway:
-        auth: api_key
-        scopes:
-          - 'mm:b2b:all'
-          - 'mm:b2b:orders-processing'
   /api/seller/v1/orders/parcels:
     post:
       description: |
@@ -225,119 +225,6 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       summary: Передать разбиение на посылки
-      tags:
-        - Задания на сборку
-      x-gateway:
-        auth: api_key
-        scopes:
-          - 'mm:b2b:all'
-          - 'mm:b2b:orders-processing'
-  /api/seller/v1/parcels/cancel:
-    post:
-      description: >
-        Метод позволяет отменить собранную посылку. При этом также отменяются товары, находящиеся в ней.
-
-
-
-
-
-
-         ⚠️ Это действие нельзя отменить.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ParcelsCancelRequest'
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ParcelsCancelResponse'
-          description: Посылка успешно отменена
-        '400':
-          $ref: '#/components/responses/400'
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '500':
-          $ref: '#/components/responses/500'
-      summary: Отменить посылку вместе с товарами
-      tags:
-        - Задания на сборку
-      x-gateway:
-        auth: api_key
-        scopes:
-          - 'mm:b2b:all'
-          - 'mm:b2b:orders-processing'
-  /api/seller/v1/parcels/create:
-    post:
-      description: |
-        Метод позволяет передать состав одной посылки.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ParcelsCreateRequest'
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ParcelsCreateResponse'
-          description: Посылка успешно создана
-        '400':
-          $ref: '#/components/responses/400'
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '500':
-          $ref: '#/components/responses/500'
-      summary: Создание посылки
-      tags:
-        - Задания на сборку
-      x-gateway:
-        auth: api_key
-        scopes:
-          - 'mm:b2b:all'
-          - 'mm:b2b:orders-processing'
-  /api/seller/v1/parcels/get-labels:
-    post:
-      description: |
-        Метод возвращает этикетки для посылок в виде одного файла
-      parameters:
-        - $ref: '#/components/parameters/DocumentAccept'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ParcelsLabelsRequest'
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ParcelsLabelsResponse'
-            application/pdf:
-              schema:
-                example: |-
-                  %PDF-1.3
-                  3 0 obj
-                  ...
-                format: binary
-                type: string
-          description: Запрос успешно выполнен
-        '400':
-          $ref: '#/components/responses/400'
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '500':
-          $ref: '#/components/responses/500'
-      summary: Получить этикетки для посылок
       tags:
         - Задания на сборку
       x-gateway:
@@ -416,6 +303,119 @@ paths:
         scopes:
           - 'mm:b2b:all'
           - 'mm:b2b:orders-processing'
+  /api/seller/v1/parcels/get-labels:
+    post:
+      description: |
+        Метод возвращает этикетки для посылок в виде одного файла
+      parameters:
+        - $ref: '#/components/parameters/DocumentAccept'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelsLabelsRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelsLabelsResponse'
+            application/pdf:
+              schema:
+                example: |-
+                  %PDF-1.3
+                  3 0 obj
+                  ...
+                format: binary
+                type: string
+          description: Запрос успешно выполнен
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Получить этикетки для посылок
+      tags:
+        - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/parcels/cancel:
+    post:
+      description: >
+        Метод позволяет отменить собранную посылку. При этом также отменяются товары, находящиеся в ней.
+
+
+
+
+
+
+         ⚠️ Это действие нельзя отменить.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelsCancelRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelsCancelResponse'
+          description: Посылка успешно отменена
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Отменить посылку вместе с товарами
+      tags:
+        - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/parcels/create:
+    post:
+      description: |
+        Метод позволяет передать состав одной посылки.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelsCreateRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelsCreateResponse'
+          description: Посылка успешно создана
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Создание посылки
+      tags:
+        - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
   /api/seller/v1/parcels/unpack:
     post:
       description: >
@@ -447,6 +447,38 @@ paths:
       summary: Удаляет посылку
       tags:
         - Задания на сборку
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/shipments/list:
+    post:
+      description: |
+        Возвращает список отгрузок за указанный период времени.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipmentListRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentListResponse'
+          description: Список отгрузок
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Список отгрузок
+      tags:
+        - Отгрузка посылок
       x-gateway:
         auth: api_key
         scopes:
@@ -485,22 +517,23 @@ paths:
         scopes:
           - 'mm:b2b:all'
           - 'mm:b2b:orders-processing'
-  /api/seller/v1/shipments/cancel:
+  /api/seller/v1/shipments/remove-parcels:
     post:
-      description: "Отменяет отгрузку. Отменить отгрузку можно только на статусе CONFIRMED  \n"
+      description: |
+        Удаляет посылки из формируемой отгрузки.
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ShipmentsCancelRequest'
+              $ref: '#/components/schemas/ShipmentRemoveParcelsRequest'
         required: true
       responses:
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ShipmentsCancelResponse'
-          description: Состав отгрузки
+                $ref: '#/components/schemas/ShipmentRemoveParcelsResponse'
+          description: Актуальный состав отгрузки
         '400':
           $ref: '#/components/responses/400'
         '403':
@@ -509,7 +542,7 @@ paths:
           $ref: '#/components/responses/404'
         '500':
           $ref: '#/components/responses/500'
-      summary: Отменить отгрузку
+      summary: Удалить посылки из отгрузки
       tags:
         - Отгрузка посылок
       x-gateway:
@@ -542,6 +575,38 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       summary: Подтвердить отгрузку
+      tags:
+        - Отгрузка посылок
+      x-gateway:
+        auth: api_key
+        scopes:
+          - 'mm:b2b:all'
+          - 'mm:b2b:orders-processing'
+  /api/seller/v1/shipments/cancel:
+    post:
+      description: "Отменяет отгрузку. Отменить отгрузку можно только на статусе CONFIRMED  \n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipmentsCancelRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentsCancelResponse'
+          description: Состав отгрузки
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Отменить отгрузку
       tags:
         - Отгрузка посылок
       x-gateway:
@@ -584,71 +649,6 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       summary: Получить документы по отгрузке
-      tags:
-        - Отгрузка посылок
-      x-gateway:
-        auth: api_key
-        scopes:
-          - 'mm:b2b:all'
-          - 'mm:b2b:orders-processing'
-  /api/seller/v1/shipments/list:
-    post:
-      description: |
-        Возвращает список отгрузок за указанный период времени.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ShipmentListRequest'
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ShipmentListResponse'
-          description: Список отгрузок
-        '400':
-          $ref: '#/components/responses/400'
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '500':
-          $ref: '#/components/responses/500'
-      summary: Список отгрузок
-      tags:
-        - Отгрузка посылок
-      x-gateway:
-        auth: api_key
-        scopes:
-          - 'mm:b2b:all'
-          - 'mm:b2b:orders-processing'
-  /api/seller/v1/shipments/remove-parcels:
-    post:
-      description: |
-        Удаляет посылки из формируемой отгрузки.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ShipmentRemoveParcelsRequest'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ShipmentRemoveParcelsResponse'
-          description: Актуальный состав отгрузки
-        '400':
-          $ref: '#/components/responses/400'
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '500':
-          $ref: '#/components/responses/500'
-      summary: Удалить посылки из отгрузки
       tags:
         - Отгрузка посылок
       x-gateway:
