@@ -1921,7 +1921,7 @@ components:
         - file_content
       type: object
     ShipmentIdType:
-      description: Идентификатор отгрузки
+      description: Идентификатор отгрузки (обязательно если не указан warehouse_id)
       maxLength: 36
       type: string
     ShipmentListRequest:
@@ -2110,7 +2110,7 @@ components:
         - DESC
       type: string
     WarehouseIdType:
-      description: Идентификатор склада
+      description: Идентификатор склада (обязательно если не указан shipment_id)
       example: 5f6f0334-0759-4e04-af31-8c5a4c4fa7b4
       format: uuid
       type: string
@@ -2140,8 +2140,6 @@ components:
             - 123123
             - 123124
           items:
-            description: >-
-              Список идентификаторов категорий, для которых необходимо получить характеристики. Обрабатываются только идентификаторы активных категорий - характеристики будут возвращены только для них.
             format: int64
             type: integer
           type: array
@@ -2149,7 +2147,6 @@ components:
         - category_ids
       type: object
     CharacteristicAttribute:
-      description: 'Список характеристик, связанных со словарем'
       properties:
         id:
           description: Уникальный идентификатор характеристики
@@ -2170,7 +2167,6 @@ components:
         - value
       type: object
     CreateSkuFilter:
-      description: Фильтры SKU
       properties:
         characteristic_id:
           description: Идентификатор справочника
@@ -2267,7 +2263,6 @@ components:
         - system_characteristic
       type: object
     ErrorInfo:
-      description: Список ошибок при обработке товаров
       properties:
         attribute_error:
           description: 'Поле, в котором произошла ошибка'
@@ -2519,7 +2514,6 @@ components:
         product_ids:
           description: Список идентификаторов продукта
           items:
-            description: Список идентификаторов продукта
             format: int64
             type: integer
           type: array
@@ -2585,7 +2579,6 @@ components:
         seller_sku_ids:
           description: Список идентификаторов СКУ в системе селлера
           items:
-            description: Список идентификаторов СКУ в системе селлера
             type: string
           maxItems: 1000
           minItems: 0
@@ -2593,7 +2586,6 @@ components:
         sku_ids:
           description: Список внутренних идентификаторов СКУ
           items:
-            description: Список внутренних идентификаторов СКУ
             format: int64
             type: integer
           maxItems: 1000
@@ -2630,13 +2622,11 @@ components:
         seller_sku_ids:
           description: Список идентификаторов СКУ в системе селлера
           items:
-            description: Список идентификаторов СКУ в системе селлера
             type: string
           type: array
         sku_ids:
           description: Список внутренних идентификаторов СКУ
           items:
-            description: Список внутренних идентификаторов СКУ
             format: int64
             type: integer
           type: array
@@ -2755,19 +2745,16 @@ components:
         seller_sku_ids:
           description: Список идентификаторов СКУ в системе селлера
           items:
-            description: Список идентификаторов СКУ в системе селлера
             type: string
           type: array
         sku_ids:
           description: Список внутренних идентификаторов СКУ
           items:
-            description: Список внутренних идентификаторов СКУ
             format: int64
             type: integer
           type: array
       type: object
     SkuFilterValue:
-      description: Массив значений фильтра
       properties:
         characteristic_value:
           description: Значение фильтра
@@ -2831,7 +2818,6 @@ components:
         product_attributes:
           description: Свойства товара
           items:
-            description: Свойства товара
             type: string
           type: array
         product_filters_list:
@@ -2971,7 +2957,6 @@ components:
         - result
       type: object
     SkuRequest:
-      description: Массив со списком SKU
       properties:
         barcode:
           description: >-
@@ -3038,7 +3023,6 @@ components:
           maxItems: 10
           type: array
         product_filters_list:
-          description: 'Характеристики, относящиеся к Продукту'
           items:
             $ref: '#/components/schemas/SkuCharacteristic'
           type: array
@@ -3051,6 +3035,7 @@ components:
           minItems: 1
           type: array
         seller_sku_id:
+          maxLength: 80
           description: >-
             Уникальный идентификатор SKU в системе селлера. Длина: до 80 символов. Допустимые символы: латиница (a-zA-Z), кириллица (а-яА-Я, кроме ёЁ), цифры (0-9), некоторые специальные символы .,\/()[]-=_.
           type: string
@@ -3284,7 +3269,6 @@ components:
         - seller_sku_id
       type: object
     UpdateSkuFilter:
-      description: Фильтры SKU
       properties:
         characteristic_id:
           description: Идентификатор справочника
@@ -3293,7 +3277,6 @@ components:
         characteristic_values:
           description: Массив значений фильтра
           items:
-            description: Массив значений фильтра
             type: string
           type: array
           uniqueItems: true
@@ -3346,7 +3329,7 @@ components:
         Выбранный формат получения ответа (по умолчанию application/json)
       in: header
       name: Accept
-      required: false
+      required: true
       schema:
         default: application/json
         enum:
