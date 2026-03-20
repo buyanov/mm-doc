@@ -14,6 +14,7 @@
             debug: false,
             // если true — будет пытаться перехватить attachShadow (самое стойкое решение)
             hookShadowDom: true,
+            normalizeArrayPropertyDetails: true,
 
             excludeSelectors: [
                 ".schema-type",
@@ -22,6 +23,7 @@
                 "code",
                 "pre",
                 "[data-component='Schema']",
+                "li button > div",
             ],
         },
 
@@ -96,6 +98,29 @@
             node.nodeValue = ru;
         },
 
+        normalizeArrayTypeText(text) {
+            if (!this.config.normalizeArrayPropertyDetails) return text;
+            if (!text) return text;
+
+            return text.replace(/\barray\s+\S*\[\]/g, "array");
+        },
+
+        normalizeTextNode(node) {
+            if (!this.config.normalizeArrayPropertyDetails) return;
+
+            const text = node.nodeValue;
+            if (!text) return;
+
+            const parent = node.parentElement;
+            if (!parent) return;
+            if (!parent.closest(".property-detail-value")) return;
+
+            const normalized = this.normalizeArrayTypeText(text);
+            if (normalized !== text) {
+                node.nodeValue = normalized;
+            }
+        },
+
         translateTree(root) {
             try {
                 const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
@@ -104,6 +129,7 @@
                     // пропускаем пустые/шумные
                     if (!n.nodeValue || !n.nodeValue.trim()) continue;
                     this.translateTextNode(n);
+                    this.normalizeTextNode(n);
                 }
             } catch (e) {
                 // root может быть не Document/Element (редко), игнорируем
@@ -116,6 +142,7 @@
                     for (const added of m.addedNodes) {
                         if (added.nodeType === Node.TEXT_NODE) {
                             this.translateTextNode(added);
+                            this.normalizeTextNode(added);
                             continue;
                         }
                         if (added.nodeType === Node.ELEMENT_NODE) {
