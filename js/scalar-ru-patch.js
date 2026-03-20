@@ -14,7 +14,8 @@
             debug: false,
             // если true — будет пытаться перехватить attachShadow (самое стойкое решение)
             hookShadowDom: true,
-            normalizeArrayPropertyDetails: true,
+            // чисто визуальщина лучше решить дереференсом
+            normalizeArrayPropertyDetails: false,
 
             excludeSelectors: [
                 ".schema-type",
